@@ -14,6 +14,21 @@ import '../entities/money.dart';
 class TransactionRules {
   const TransactionRules._();
 
+  /// Tên trường định danh tiêu đề giao dịch.
+  static const String fieldTitle = 'title';
+
+  /// Tên trường định danh số tiền giao dịch.
+  static const String fieldAmount = 'amount';
+
+  /// Tên trường định danh ngày phát sinh giao dịch.
+  static const String fieldDate = 'date';
+
+  /// Năm tối thiểu được chấp nhận cho một giao dịch.
+  static const int minYear = 2000;
+
+  /// Khoảng thời gian dung sai tương lai cho phép do lệch múi giờ (1 ngày).
+  static const Duration maxFutureTolerance = Duration(days: 1);
+
   /// Kiểm tra các ràng buộc nghiệp vụ cho dữ liệu giao dịch.
   ///
   /// Danh sách kiểm tra theo thứ tự:
@@ -32,7 +47,7 @@ class TransactionRules {
     if (title.trim().isEmpty) {
       errors.add(
         const ValidationException(
-          field: 'title',
+          field: fieldTitle,
           message: 'Tiêu đề giao dịch không được để trống.',
         ),
       );
@@ -42,7 +57,7 @@ class TransactionRules {
     if (amount.amount <= 0) {
       errors.add(
         const ValidationException(
-          field: 'amount',
+          field: fieldAmount,
           message: 'Số tiền phải là số nguyên dương lớn hơn 0.',
         ),
       );
@@ -50,12 +65,12 @@ class TransactionRules {
 
     // Quy tắc 3: Ngày giao dịch
     final currentTime = now ?? DateTime.now();
-    final maxAllowedDate = currentTime.add(const Duration(days: 1));
+    final maxAllowedDate = currentTime.add(maxFutureTolerance);
 
-    if (date.isAfter(maxAllowedDate) || date.year < 2000) {
+    if (date.isAfter(maxAllowedDate) || date.year < minYear) {
       errors.add(
         const ValidationException(
-          field: 'date',
+          field: fieldDate,
           message: 'Ngày giao dịch không hợp lệ (từ năm 2000 đến hiện tại).',
         ),
       );

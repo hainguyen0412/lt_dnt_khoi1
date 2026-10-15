@@ -8,16 +8,19 @@ import '../../domain/entities/transaction_summary.dart';
 /// - Đảm bảo tính vét cạn (exhaustive pattern matching) khi render UI tại `TransactionListView`.
 /// - Tách biệt hoàn toàn trạng thái hiển thị danh sách với trạng thái thao tác form (`isSubmitting`, `fieldErrors`).
 sealed class TransactionListState {
+  /// Khởi tạo [TransactionListState] cơ sở.
   const TransactionListState();
 }
 
 /// Trạng thái khởi tạo ban đầu khi chưa thực hiện bất kỳ truy vấn nào.
 final class TransactionListInitial extends TransactionListState {
+  /// Khởi tạo [TransactionListInitial].
   const TransactionListInitial();
 }
 
 /// Trạng thái đang tải danh sách giao dịch (hiển thị Shimmer hoặc Loading Spinner).
 final class TransactionListLoading extends TransactionListState {
+  /// Khởi tạo [TransactionListLoading].
   const TransactionListLoading();
 }
 
@@ -29,6 +32,7 @@ final class TransactionListLoaded extends TransactionListState {
   /// Thống kê tài chính tổng quan (tổng thu, tổng chi, số dư).
   final TransactionSummary summary;
 
+  /// Khởi tạo [TransactionListLoaded] với [items] và [summary] bắt buộc.
   const TransactionListLoaded({
     required this.items,
     required this.summary,
@@ -56,6 +60,7 @@ final class TransactionListLoaded extends TransactionListState {
 
 /// Trạng thái truy vấn thành công nhưng kho dữ liệu hoàn toàn rỗng (0 giao dịch).
 final class TransactionListEmpty extends TransactionListState {
+  /// Khởi tạo [TransactionListEmpty].
   const TransactionListEmpty();
 }
 
@@ -75,6 +80,7 @@ final class TransactionListError extends TransactionListState {
   /// Thống kê tài chính trước đó (nếu có).
   final TransactionSummary? previousSummary;
 
+  /// Khởi tạo [TransactionListError] với [error] và dữ liệu dự phòng [previousItems], [previousSummary].
   const TransactionListError({
     required this.error,
     this.previousItems,

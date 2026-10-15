@@ -425,7 +425,8 @@ void main() {
 
     test('14. update() thất bại do ServerException -> đổ lỗi vào actionError',
         () async {
-      final serverEx = ServerException(statusCode: 500, message: 'Server 500 error');
+      final serverEx =
+          ServerException(statusCode: 500, message: 'Server 500 error');
       when(() => mockUpdateTransaction(any()))
           .thenAnswer((_) async => Failure(serverEx));
       when(() => mockErrorHandler.handle(any(), any(),
@@ -447,7 +448,8 @@ void main() {
     test(
         '15. delete() thất bại do ServerException -> gán vào actionError và trả về false',
         () async {
-      final serverEx = ServerException(statusCode: 500, message: 'Delete failed on server');
+      final serverEx =
+          ServerException(statusCode: 500, message: 'Delete failed on server');
       when(() => mockDeleteTransaction('tx-001'))
           .thenAnswer((_) async => Failure(serverEx));
       when(() => mockErrorHandler.handle(any(), any(),
@@ -470,9 +472,9 @@ void main() {
         () async {
       when(() => mockGetTransactions())
           .thenAnswer((_) async => Success([sampleTx]));
-      final serverEx = ServerException(statusCode: 500, message: 'Summary service unavailable');
-      when(() => mockGetSummary())
-          .thenAnswer((_) async => Failure(serverEx));
+      final serverEx = ServerException(
+          statusCode: 500, message: 'Summary service unavailable');
+      when(() => mockGetSummary()).thenAnswer((_) async => Failure(serverEx));
       when(() => mockErrorHandler.handle(any(), any(),
               source: any(named: 'source')))
           .thenAnswer((_) async => const UserFacingError(
@@ -489,7 +491,8 @@ void main() {
     });
 
     test('17. clearActionError() xóa bỏ actionError hiện có', () async {
-      final serverEx = ServerException(statusCode: 500, message: 'Action failure');
+      final serverEx =
+          ServerException(statusCode: 500, message: 'Action failure');
       when(() => mockDeleteTransaction('tx-001'))
           .thenAnswer((_) async => Failure(serverEx));
       when(() => mockErrorHandler.handle(any(), any(),

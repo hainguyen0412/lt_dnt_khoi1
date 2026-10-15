@@ -198,6 +198,55 @@ class TransactionNotifier extends ChangeNotifier {
     }
   }
 
+  /// Xử lý ngoại lệ phát sinh từ các thao tác ghi dữ liệu (add/update/delete).
+  ///
+  /// Tất cả lỗi đều đi qua [ErrorHandler] để chuẩn hóa và ghi log tập trung (R11).
+  /// Nếu là [ValidationException] có trường cụ thể thì đưa vào [_fieldErrors],
+  /// ngược lại thì gán vào [_actionError] để hiển thị qua SnackBar (R10).
+  Future<void> _handleActionFailure(AppException error) async {
+    final userError = await _errorHandler.handle(
+      error,
+      error.stackTrace ?? StackTrace.current,
+      source: 'TransactionNotifier',
+    );
+
+    if (error is ValidationException && error.field != null) {
+      _fieldErrors[error.field!] = userError.message;
+    } else {
+      _actionError = userError;
+    }
+  }
+
+  /// Trích xuất dữ liệu danh sách trước đó nếu có để bảo tồn UI khi reload gặp lỗi.
+  (List<Transaction>?, TransactionSummary?) _getPreviousData() {
+    return switch (_listState) {
+      TransactionListLoaded(:final items, :final summary) => (items, summary),
+      TransactionListError(:final previousItems, :final previousSummary) => (
+          previousItems,
+          previousSummary
+        ),
+      _ => (null, null),
+    };
+  }
+
+  /// Đặt trạng thái lỗi cho danh sách kèm dữ liệu trước đó để dự phòng offline.
+  Future<void> _setListError(
+    AppException error, {
+    List<Transaction>? previousItems,
+    TransactionSummary? previousSummary,
+  }) async {
+    final userError = await _errorHandler.handle(
+      error,
+      error.stackTrace ?? StackTrace.current,
+      source: 'TransactionNotifier',
+    );
+    _listState = TransactionListError(
+      error: userError,
+      previousItems: previousItems,
+      previousSummary: previousSummary,
+    );
+  }
+
   // ================= CÁC THAO TÁC NGHIỆP VỤ =================
 
   /// Tải danh sách giao dịch và thông tin tổng kết tài chính từ Repository.
@@ -211,27 +260,13 @@ class TransactionNotifier extends ChangeNotifier {
     await _run(
       setLoading: true,
       action: () async {
-        List<Transaction>? previousItems;
-        TransactionSummary? previousSummary;
-        final currentState = _listState;
-        if (currentState is TransactionListLoaded) {
-          previousItems = currentState.items;
-          previousSummary = currentState.summary;
-        } else if (currentState is TransactionListError) {
-          previousItems = currentState.previousItems;
-          previousSummary = currentState.previousSummary;
-        }
+        final (previousItems, previousSummary) = _getPreviousData();
 
         final transactionsResult = await _getTransactions();
         if (transactionsResult.isFailure) {
           final failure = transactionsResult as Failure<List<Transaction>>;
-          final userError = await _errorHandler.handle(
+          await _setListError(
             failure.error,
-            failure.error.stackTrace ?? StackTrace.current,
-            source: 'TransactionNotifier',
-          );
-          _listState = TransactionListError(
-            error: userError,
             previousItems: previousItems,
             previousSummary: previousSummary,
           );
@@ -241,13 +276,8 @@ class TransactionNotifier extends ChangeNotifier {
         final summaryResult = await _getSummary();
         if (summaryResult.isFailure) {
           final failure = summaryResult as Failure<TransactionSummary>;
-          final userError = await _errorHandler.handle(
+          await _setListError(
             failure.error,
-            failure.error.stackTrace ?? StackTrace.current,
-            source: 'TransactionNotifier',
-          );
-          _listState = TransactionListError(
-            error: userError,
             previousItems: previousItems,
             previousSummary: previousSummary,
           );
@@ -280,23 +310,7 @@ class TransactionNotifier extends ChangeNotifier {
         final res = await _addTransaction(draft);
         if (res.isFailure) {
           final failure = res as Failure<Transaction>;
-          // Tất cả lỗi đều đi qua ErrorHandler để ghi log tập trung (R11)
-          final userError = await _errorHandler.handle(
-            failure.error,
-            failure.error.stackTrace ?? StackTrace.current,
-            source: 'TransactionNotifier',
-          );
-
-          if (failure.error is ValidationException) {
-            final ve = failure.error as ValidationException;
-            if (ve.field != null) {
-              _fieldErrors[ve.field!] = userError.message;
-            } else {
-              _actionError = userError;
-            }
-          } else {
-            _actionError = userError;
-          }
+          await _handleActionFailure(failure.error);
           return false;
         }
 
@@ -323,22 +337,7 @@ class TransactionNotifier extends ChangeNotifier {
         final res = await _updateTransaction(transaction);
         if (res.isFailure) {
           final failure = res as Failure<Transaction>;
-          final userError = await _errorHandler.handle(
-            failure.error,
-            failure.error.stackTrace ?? StackTrace.current,
-            source: 'TransactionNotifier',
-          );
-
-          if (failure.error is ValidationException) {
-            final ve = failure.error as ValidationException;
-            if (ve.field != null) {
-              _fieldErrors[ve.field!] = userError.message;
-            } else {
-              _actionError = userError;
-            }
-          } else {
-            _actionError = userError;
-          }
+          await _handleActionFailure(failure.error);
           return false;
         }
 
@@ -364,12 +363,7 @@ class TransactionNotifier extends ChangeNotifier {
         final res = await _deleteTransaction(id);
         if (res.isFailure) {
           final failure = res as Failure<void>;
-          final userError = await _errorHandler.handle(
-            failure.error,
-            failure.error.stackTrace ?? StackTrace.current,
-            source: 'TransactionNotifier',
-          );
-          _actionError = userError;
+          await _handleActionFailure(failure.error);
           return false;
         }
 
