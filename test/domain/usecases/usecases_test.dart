@@ -144,7 +144,33 @@ void main() {
           )).called(1);
     });
 
-    test('5. Repository ném Failure -> Usecase truyền nguyên vẹn Failure lên',
+    test(
+        '5. Khởi tạo mặc định không truyền idGenerator và clock -> Sinh ID hợp lệ và gắn createdAt hiện tại',
+        () async {
+      final defaultAddTransaction = AddTransaction(mockRepository);
+      final validDraft = TransactionDraft(
+        type: TransactionType.income,
+        title: 'Lương tháng',
+        amount: const Money(15000000),
+        category: Category.salary,
+        date: DateTime.now(),
+      );
+
+      when(() => mockRepository.add(any())).thenAnswer((invocation) async {
+        final tx = invocation.positionalArguments.first as Transaction;
+        return Success(tx);
+      });
+
+      final result = await defaultAddTransaction(validDraft);
+
+      expect(result.isSuccess, isTrue);
+      final created = (result as Success<Transaction>).data;
+      expect(created.id, isNotEmpty);
+      expect(created.createdAt, isNotNull);
+      verify(() => mockRepository.add(any())).called(1);
+    });
+
+    test('6. Repository ném Failure -> Usecase truyền nguyên vẹn Failure lên',
         () async {
       final validDraft = TransactionDraft(
         type: TransactionType.expense,
