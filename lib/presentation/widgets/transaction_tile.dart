@@ -4,6 +4,7 @@ import '../../domain/entities/category.dart';
 import '../../domain/entities/money.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/transaction_type.dart';
+import '../utils/category_extension.dart';
 import '../utils/money_formatter.dart';
 
 /// Thẻ hiển thị một giao dịch thu - chi trong danh sách kèm thao tác vuốt để xóa.
@@ -140,24 +141,11 @@ class _CategoryIconBadge extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: Icon(
-        _getCategoryIcon(category),
+        category.icon,
         color: color,
         size: 22,
       ),
     );
-  }
-
-  static IconData _getCategoryIcon(Category category) {
-    return switch (category) {
-      Category.food => Icons.restaurant_rounded,
-      Category.transport => Icons.directions_car_rounded,
-      Category.shopping => Icons.shopping_bag_rounded,
-      Category.bills => Icons.receipt_long_rounded,
-      Category.health => Icons.medical_services_rounded,
-      Category.entertainment => Icons.sports_esports_rounded,
-      Category.salary => Icons.payments_rounded,
-      Category.other => Icons.category_rounded,
-    };
   }
 }
 

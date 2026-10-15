@@ -18,11 +18,6 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final balance = summary.balance;
-    final isNegative = balance.amount < 0;
-
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -32,51 +27,84 @@ class SummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Số dư hiện tại',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              isNegative
-                  ? '- ${MoneyFormatter.formatVnd(balance.amount.abs())}'
-                  : MoneyFormatter.formatVnd(balance.amount),
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: isNegative ? colorScheme.error : colorScheme.primary,
-              ),
-            ),
+            _BalanceHeader(balance: summary.balance),
             const Divider(height: 28),
-            Row(
-              children: [
-                Expanded(
-                  child: _SummaryMetric(
-                    label: 'Tổng thu',
-                    amount: summary.totalIncome,
-                    type: TransactionType.income,
-                    color: Colors.green.shade700,
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 36,
-                  color: colorScheme.outlineVariant,
-                ),
-                Expanded(
-                  child: _SummaryMetric(
-                    label: 'Tổng chi',
-                    amount: summary.totalExpense,
-                    type: TransactionType.expense,
-                    color: Colors.red.shade700,
-                  ),
-                ),
-              ],
-            ),
+            _MetricsRow(summary: summary),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _BalanceHeader extends StatelessWidget {
+  final Money balance;
+
+  const _BalanceHeader({required this.balance});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isNegative = balance.amount < 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Số dư hiện tại',
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          isNegative
+              ? '- ${MoneyFormatter.formatVnd(balance.amount.abs())}'
+              : MoneyFormatter.formatVnd(balance.amount),
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isNegative ? colorScheme.error : colorScheme.primary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MetricsRow extends StatelessWidget {
+  final TransactionSummary summary;
+
+  const _MetricsRow({required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _SummaryMetric(
+            label: 'Tổng thu',
+            amount: summary.totalIncome,
+            type: TransactionType.income,
+            color: Colors.green.shade700,
+          ),
+        ),
+        Container(
+          width: 1,
+          height: 36,
+          color: colorScheme.outlineVariant,
+        ),
+        Expanded(
+          child: _SummaryMetric(
+            label: 'Tổng chi',
+            amount: summary.totalExpense,
+            type: TransactionType.expense,
+            color: Colors.red.shade700,
+          ),
+        ),
+      ],
     );
   }
 }
