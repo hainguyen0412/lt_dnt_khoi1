@@ -61,7 +61,7 @@ class ErrorBoundary extends StatelessWidget {
             onDismiss: onDismiss,
           );
         }
-        return childWidget!;
+        return childWidget ?? child;
       },
       child: child,
     );

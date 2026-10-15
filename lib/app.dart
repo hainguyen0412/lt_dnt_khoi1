@@ -39,65 +39,7 @@ class ExpenseTrackerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        // 1. Trình điều khiển giả lập lỗi (lắng nghe và cập nhật UI khi đổi mode)
-        ChangeNotifierProvider<FailureSimulator>.value(
-          value: dependencies.failureSimulator,
-        ),
-
-        // 2. Repository Interface của tầng Domain
-        Provider<TransactionRepository>.value(
-          value: dependencies.repository,
-        ),
-
-        // 3. Bộ xử lý ngoại lệ tập trung (Centralized Error Pipeline)
-        Provider<ErrorHandler>.value(
-          value: dependencies.errorHandler,
-        ),
-
-        // 4. FileLogger phục vụ màn hình Log Viewer (T-306) ở Sprint 3
-        Provider<ErrorLogger>.value(
-          value: dependencies.fileLogger,
-        ),
-
-        // 5. Toàn bộ đối tượng AppDependencies
-        Provider<AppDependencies>.value(
-          value: dependencies,
-        ),
-
-        // 6. Danh sách 6 UseCases độc lập của Domain Layer
-        Provider<GetTransactions>.value(
-          value: dependencies.getTransactions,
-        ),
-        Provider<GetTransactionById>.value(
-          value: dependencies.getTransactionById,
-        ),
-        Provider<AddTransaction>.value(
-          value: dependencies.addTransaction,
-        ),
-        Provider<UpdateTransaction>.value(
-          value: dependencies.updateTransaction,
-        ),
-        Provider<DeleteTransaction>.value(
-          value: dependencies.deleteTransaction,
-        ),
-        Provider<GetSummary>.value(
-          value: dependencies.getSummary,
-        ),
-
-        // 7. Quản lý trạng thái và điều phối nghiệp vụ giao dịch (T-301)
-        ChangeNotifierProvider<TransactionNotifier>(
-          create: (context) => TransactionNotifier(
-            getTransactions: dependencies.getTransactions,
-            getTransactionById: dependencies.getTransactionById,
-            addTransaction: dependencies.addTransaction,
-            updateTransaction: dependencies.updateTransaction,
-            deleteTransaction: dependencies.deleteTransaction,
-            getSummary: dependencies.getSummary,
-            errorHandler: dependencies.errorHandler,
-          ),
-        ),
-      ],
+      providers: _createProviders(),
       child: MaterialApp(
         title: 'Sổ Chi Tiêu Cá Nhân',
         debugShowCheckedModeBanner: false,
@@ -108,5 +50,67 @@ class ExpenseTrackerApp extends StatelessWidget {
         home: const TransactionListScreen(),
       ),
     );
+  }
+
+  List<InheritedProvider<Object?>> _createProviders() {
+    return [
+      // 1. Trình điều khiển giả lập lỗi (lắng nghe và cập nhật UI khi đổi mode)
+      ChangeNotifierProvider<FailureSimulator>.value(
+        value: dependencies.failureSimulator,
+      ),
+
+      // 2. Repository Interface của tầng Domain
+      Provider<TransactionRepository>.value(
+        value: dependencies.repository,
+      ),
+
+      // 3. Bộ xử lý ngoại lệ tập trung (Centralized Error Pipeline)
+      Provider<ErrorHandler>.value(
+        value: dependencies.errorHandler,
+      ),
+
+      // 4. FileLogger phục vụ màn hình Log Viewer (T-306) ở Sprint 3
+      Provider<ErrorLogger>.value(
+        value: dependencies.fileLogger,
+      ),
+
+      // 5. Toàn bộ đối tượng AppDependencies
+      Provider<AppDependencies>.value(
+        value: dependencies,
+      ),
+
+      // 6. Danh sách 6 UseCases độc lập của Domain Layer
+      Provider<GetTransactions>.value(
+        value: dependencies.getTransactions,
+      ),
+      Provider<GetTransactionById>.value(
+        value: dependencies.getTransactionById,
+      ),
+      Provider<AddTransaction>.value(
+        value: dependencies.addTransaction,
+      ),
+      Provider<UpdateTransaction>.value(
+        value: dependencies.updateTransaction,
+      ),
+      Provider<DeleteTransaction>.value(
+        value: dependencies.deleteTransaction,
+      ),
+      Provider<GetSummary>.value(
+        value: dependencies.getSummary,
+      ),
+
+      // 7. Quản lý trạng thái và điều phối nghiệp vụ giao dịch (T-301)
+      ChangeNotifierProvider<TransactionNotifier>(
+        create: (context) => TransactionNotifier(
+          getTransactions: dependencies.getTransactions,
+          getTransactionById: dependencies.getTransactionById,
+          addTransaction: dependencies.addTransaction,
+          updateTransaction: dependencies.updateTransaction,
+          deleteTransaction: dependencies.deleteTransaction,
+          getSummary: dependencies.getSummary,
+          errorHandler: dependencies.errorHandler,
+        ),
+      ),
+    ];
   }
 }

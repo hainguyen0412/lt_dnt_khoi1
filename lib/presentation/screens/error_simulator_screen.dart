@@ -57,8 +57,9 @@ class _ErrorSimulatorScreenState extends State<ErrorSimulatorScreen> {
   }
 
   void _handleTriggerAsyncError(BuildContext context) {
-    if (widget.onTriggerAsyncError != null) {
-      widget.onTriggerAsyncError!();
+    final customTrigger = widget.onTriggerAsyncError;
+    if (customTrigger != null) {
+      customTrigger();
     } else {
       Future<void>.delayed(const Duration(milliseconds: 50), () {
         throw StateError(
@@ -118,35 +119,42 @@ class _ErrorSimulatorScreenState extends State<ErrorSimulatorScreen> {
           ),
           body: ListView(
             padding: const EdgeInsets.all(16.0),
-            children: [
-              ModeSelectorCard(
-                currentMode: simulator.mode,
-                onModeChanged: (newMode) => simulator.mode = newMode,
-              ),
-              const SizedBox(height: 12),
-              ReloadListCard(
-                onReload: () => _handleReload(context),
-                state: notifier.listState,
-                isLoading: _isReloading,
-              ),
-              const SizedBox(height: 12),
-              BuildErrorCard(
-                isTriggered: _isBuildErrorTriggered,
-                onToggle: (val) => setState(() => _isBuildErrorTriggered = val),
-              ),
-              const SizedBox(height: 12),
-              AsyncErrorCard(
-                onTrigger: () => _handleTriggerAsyncError(context),
-              ),
-              const SizedBox(height: 12),
-              ValidationErrorCard(
-                onTrigger: () => _handleTriggerValidation(context),
-                fieldError: notifier.fieldErrors['amount'],
-              ),
-            ],
+            children: _buildCardsList(simulator, notifier),
           ),
         );
       },
     );
+  }
+
+  List<Widget> _buildCardsList(
+    FailureSimulator simulator,
+    TransactionNotifier notifier,
+  ) {
+    return [
+      ModeSelectorCard(
+        currentMode: simulator.mode,
+        onModeChanged: (newMode) => simulator.mode = newMode,
+      ),
+      const SizedBox(height: 12),
+      ReloadListCard(
+        onReload: () => _handleReload(context),
+        state: notifier.listState,
+        isLoading: _isReloading,
+      ),
+      const SizedBox(height: 12),
+      BuildErrorCard(
+        isTriggered: _isBuildErrorTriggered,
+        onToggle: (val) => setState(() => _isBuildErrorTriggered = val),
+      ),
+      const SizedBox(height: 12),
+      AsyncErrorCard(
+        onTrigger: () => _handleTriggerAsyncError(context),
+      ),
+      const SizedBox(height: 12),
+      ValidationErrorCard(
+        onTrigger: () => _handleTriggerValidation(context),
+        fieldError: notifier.fieldErrors['amount'],
+      ),
+    ];
   }
 }
