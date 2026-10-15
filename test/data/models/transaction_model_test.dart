@@ -219,5 +219,78 @@ void main() {
         expectParseException(wrongTypeNote, 'note');
       });
     });
+
+    group(
+        '7. toEntity() chuyển đổi an toàn và ném ParseException khi type/category lạ',
+        () {
+      test('7.1 toEntity ném ParseException khi type không được hỗ trợ', () {
+        final model = TransactionModel(
+          id: 'tx-unsupported-type',
+          type: 'crypto_swap',
+          title: 'Đổi coin',
+          amount: 500000,
+          category: 'other',
+          date: fixedDate,
+          createdAt: fixedCreatedAt,
+        );
+
+        expect(
+          () => model.toEntity(),
+          throwsA(
+            isA<ParseException>().having(
+              (e) => e.message,
+              'message',
+              contains("Unsupported transaction type 'crypto_swap'"),
+            ),
+          ),
+        );
+      });
+
+      test('7.2 toEntity ném ParseException khi category không được hỗ trợ',
+          () {
+        final model = TransactionModel(
+          id: 'tx-unsupported-category',
+          type: 'expense',
+          title: 'Đánh đề',
+          amount: 500000,
+          category: 'gambling',
+          date: fixedDate,
+          createdAt: fixedCreatedAt,
+        );
+
+        expect(
+          () => model.toEntity(),
+          throwsA(
+            isA<ParseException>().having(
+              (e) => e.message,
+              'message',
+              contains("Unsupported category 'gambling'"),
+            ),
+          ),
+        );
+      });
+    });
+
+    group('8. So sánh bằng nhau (==), hashCode và toString()', () {
+      test(
+          '8.1 Hai đối tượng giống hệt các trường thì bằng nhau và cùng hashCode',
+          () {
+        final m1 = TransactionModel.fromJson(validFullJson);
+        final m2 = TransactionModel.fromJson(validFullJson);
+        final mDiff = TransactionModel.fromJson(validMinimalJson);
+
+        expect(m1 == m2, isTrue);
+        expect(m1.hashCode, equals(m2.hashCode));
+        expect(m1 == mDiff, isFalse);
+      });
+
+      test('8.2 toString() in ra id, type, title, amount, date', () {
+        final m = TransactionModel.fromJson(validFullJson);
+        expect(
+            m.toString(),
+            contains(
+                'TransactionModel(id: tx-100, type: expense, title: Tiền cơm trưa, amount: 35000'));
+      });
+    });
   });
 }
