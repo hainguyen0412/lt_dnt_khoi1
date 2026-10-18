@@ -1,0 +1,25 @@
+name: expense_tracker
+description: "Sổ chi tiêu cá nhân - Mobile Programming Assignment"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.0.0
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.5+1
+  shared_preferences: ^2.5.6
+  path_provider: ^2.1.6
+  intl: ^0.20.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  mocktail: ^1.0.5
+
+flutter:
+  uses-material-design: true
