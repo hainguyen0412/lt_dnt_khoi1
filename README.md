@@ -325,7 +325,3 @@ Tất cả các thư viện sử dụng trong `pubspec.yaml` đều được ch�
 | `flutter_test` | SDK | Dev | Framework phục vụ việc viết và thực thi 223 Unit Test và Widget Test. |
 | `flutter_lints` | `^4.0.0` | Dev | Thiết lập các quy tắc chuẩn mực Effective Dart và phân tích mã nguồn tĩnh. |
 | `mocktail` | `^1.0.5` | Dev | Giả lập mock objects an toàn type-safe cho Unit Test mà không cần chạy code generation. |
-
----
-
-*Dự án hoàn thành đúng tiến độ theo quy chuẩn Sprint, đạt 100% tiêu chí Clean Code và sẵn sàng cho buổi nghiệm thu đồ án.*
