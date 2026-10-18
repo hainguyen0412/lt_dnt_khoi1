@@ -1,0 +1,883 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+% ==============================================================================
+% DỰ ÁN: SỔ CHI TIÊU CÁ NHÂN (EXPENSE TRACKER) - CHỦ ĐỀ 01
+% MÔN HỌC: LẬP TRÌNH ỨNG DỤNG DI ĐỘNG NÂNG CAO (ADVANCED MOBILE PROGRAMMING)
+% FILE: slides.tex (ĐÃ TỐI ƯU HÓA HOÀN HẢO CHO OVERLEAF)
+%
+% HƯỚNG DẪN BIÊN DỊCH TRÊN OVERLEAF:
+% 1. Đăng nhập https://www.overleaf.com -> Tạo project mới: "Blank Project".
+% 2. Mở file "main.tex" (hoặc "slides.tex"), dán toàn bộ nội dung file này vào.
+% 3. Chọn Compiler: "pdfLaTeX" (Mặc định) hoặc "XeLaTeX". Cả hai đều biên dịch tốt 100%.
+% 4. Bấm "Recompile" (Ctrl + Enter) để tạo file PDF slide hoàn chỉnh.
+% ==============================================================================
+
+% --- CẤU HÌNH TIẾNG VIỆT & FONT CHỮ ---
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage[T5,T1]{fontenc}
+\usepackage{lmodern}
+
+% --- CÁC GÓI GIAO DIỆN & TIỆN ÍCH ---
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, fit, backgrounds, shadows, trees}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% --- ĐỊNH NGHĨA BẢNG MÀU HIỆN ĐẠI (MODERN TECH PALETTE) ---
+\definecolor{NavyDark}{RGB}{15, 23, 42}       % Slate 900
+\definecolor{NavyPrimary}{RGB}{30, 58, 138}   % Blue 900
+\definecolor{IndigoAccent}{RGB}{79, 70, 229}  % Indigo 600
+\definecolor{CyanAccent}{RGB}{14, 165, 233}   % Sky 500
+\definecolor{EmeraldGreen}{RGB}{16, 185, 129} % Green 500
+\definecolor{AmberWarn}{RGB}{245, 158, 11}    % Amber 500
+\definecolor{RoseDanger}{RGB}{239, 68, 68}    % Rose 500
+\definecolor{SlateMuted}{RGB}{100, 116, 139}  % Slate 500
+\definecolor{SlateLight}{RGB}{241, 245, 249}  % Slate 100
+\definecolor{CodeBg}{RGB}{248, 250, 252}      % Slate 50
+\definecolor{CodeBorder}{RGB}{203, 213, 225}  % Slate 300
+
+% --- TÙY BIẾN BEAMER THEME ---
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+\setbeamercolor{palette primary}{bg=NavyDark, fg=white}
+\setbeamercolor{palette secondary}{bg=NavyPrimary, fg=white}
+\setbeamercolor{palette tertiary}{bg=IndigoAccent, fg=white}
+\setbeamercolor{structure}{fg=NavyPrimary}
+\setbeamercolor{titlelike}{fg=NavyDark}
+\setbeamercolor{frametitle}{bg=NavyDark, fg=white}
+\setbeamercolor{frametitle right}{bg=NavyDark}
+\setbeamercolor{item}{fg=IndigoAccent}
+\setbeamercolor{subitem}{fg=CyanAccent}
+
+% Tắt thanh điều hướng rườm rà
+\setbeamertemplate{navigation symbols}{}
+
+% Tùy biến thanh chân trang (Footline)
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1ex,center]{palette primary}%
+    \usebeamerfont{author in head/foot}\textbf{Chủ đề 01: Sổ Chi Tiêu Cá Nhân}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1ex,center]{palette secondary}%
+    \usebeamerfont{title in head/foot}Clean Architecture \& Error Pipeline
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1ex,right]{palette primary}%
+    \usebeamerfont{date in head/foot}Slide \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% --- CẤU HÌNH CÚ PHÁP DART CHO LISTINGS ---
+\lstdefinelanguage{Dart}{
+  keywords={sealed, class, mixin, factory, const, final, var, void, bool, int, double, String, Future, Stream, async, await, return, throw, rethrow, try, catch, finally, switch, case, break, if, else, with, implements, extends, static, abstract, interface, this, super, new, null, true, false, Object, dynamic, is, as},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+}
+
+\lstset{
+  language=Dart,
+  basicstyle=\ttfamily\scriptsize\color{NavyDark},
+  keywordstyle=\bfseries\color{IndigoAccent},
+  stringstyle=\color{EmeraldGreen!80!black},
+  commentstyle=\itshape\color{SlateMuted},
+  backgroundcolor=\color{CodeBg},
+  frame=single,
+  framerule=0.8pt,
+  rulecolor=\color{IndigoAccent},
+  framesep=3.5pt,
+  tabsize=2,
+  breaklines=true,
+  showstringspaces=false,
+  numbers=none,
+  xleftmargin=1mm,
+  xrightmargin=1mm
+}
+
+% --- MACROS BADGES CHO NGƯỜI TRÌNH BÀY ---
+\newcommand{\speakerA}{\hfill\tcbox[colback=IndigoAccent,colframe=IndigoAccent,boxsep=1pt,left=3pt,right=3pt,top=1pt,bottom=1pt]{\tiny\bfseries\color{white}SV A: Nguyễn Đức Hải}}
+\newcommand{\speakerB}{\hfill\tcbox[colback=NavyPrimary,colframe=NavyPrimary,boxsep=1pt,left=3pt,right=3pt,top=1pt,bottom=1pt]{\tiny\bfseries\color{white}SV B: Phạm Nhung}}
+\newcommand{\speakerBoth}{\hfill\tcbox[colback=EmeraldGreen,colframe=EmeraldGreen,boxsep=1pt,left=3pt,right=3pt,top=1pt,bottom=1pt]{\tiny\bfseries\color{white}Cả 2 Thành Viên}}
+
+% --- HỘP THÔNG TIN TCOLORBOX ---
+\newtcolorbox{infobox}[2][IndigoAccent]{
+  colback=SlateLight,
+  colframe=#1,
+  fonttitle=\bfseries\scriptsize,
+  title=#2,
+  arc=1.5mm,
+  boxrule=0.8pt,
+  left=2mm, right=2mm, top=1.2mm, bottom=1.2mm
+}
+
+% ==============================================================================
+% BẮT ĐẦU TÀI LIỆU SLIDE
+% ==============================================================================
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% SLIDE 1: TRANG BÌA
+% ------------------------------------------------------------------------------
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[NavyDark] (current page.south west) rectangle (current page.north east);
+    \fill[NavyPrimary!30] (current page.north west) -- ($(current page.north west)+(16cm,-3.2cm)$) -- ($(current page.north west)+(0,-3.2cm)$) -- cycle;
+    
+    \node[anchor=north west, white, align=left] at ($(current page.north west)+(0.8cm,-0.6cm)$) {
+      {\scriptsize\bfseries\color{CyanAccent} BÁO CÁO ĐỒ ÁN MÔN HỌC}\\[1mm]
+      {\small\bfseries LẬP TRÌNH ỨNG DỤNG DI ĐỘNG NÂNG CAO (ADVANCED MOBILE PROGRAMMING)}
+    };
+    
+    \node[anchor=west, white, align=left] at ($(current page.west)+(0.8cm,0.4cm)$) {
+      {\Huge\bfseries SỔ CHI TIÊU CÁ NHÂN}\\[2mm]
+      {\Large\color{CyanAccent}\bfseries (EXPENSE TRACKER -- CHỦ ĐỀ 01)}\\[3mm]
+      {\footnotesize\color{SlateLight} Kiến trúc: \textbf{Clean Architecture 4 Tầng} $\bullet$ \textbf{Centralized Error Handling Pipeline}}
+    };
+    
+    \node[anchor=south west] at ($(current page.south west)+(0.8cm,0.8cm)$) {
+      \begin{tcolorbox}[width=6.8cm, colback=white!10, colframe=CyanAccent, arc=1.5mm, boxrule=0.6pt]
+        {\scriptsize\bfseries\color{CyanAccent} SINH VIÊN B:}\\[0.5mm]
+        {\small\bfseries\color{white} Phạm Nhung}\\[0.5mm]
+        {\tiny\color{SlateLight} MSSV: 106230021 $\bullet$ GitHub: @Nhung106230021}
+      \end{tcolorbox}
+    };
+    
+    \node[anchor=south west] at ($(current page.south west)+(8.2cm,0.8cm)$) {
+      \begin{tcolorbox}[width=6.8cm, colback=white!10, colframe=IndigoAccent, arc=1.5mm, boxrule=0.6pt]
+        {\scriptsize\bfseries\color{CyanAccent} SINH VIÊN A:}\\[0.5mm]
+        {\small\bfseries\color{white} Nguyễn Đức Hải}\\[0.5mm]
+        {\tiny\color{SlateLight} GitHub: @hainguyen0412}
+      \end{tcolorbox}
+    };
+  \end{tikzpicture}
+  \note{Kính chào Thầy Cô và các bạn. Hôm nay nhóm xin báo cáo đồ án Chủ đề 01: Sổ Chi Tiêu Cá Nhân. Dự án tập trung vào Clean Architecture chuẩn mực và hệ thống xử lý lỗi tập trung chịu lỗi cao.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 2: BÀI TOÁN & GIẢI PHÁP
+% ------------------------------------------------------------------------------
+\begin{frame}{Bài Toán Thực Tế \& Mục Tiêu Giải Pháp \speakerB}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \begin{tcolorbox}[colback=RoseDanger!5, colframe=RoseDanger, title=\textbf{1. Vấn đề thực tế}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{2pt}\scriptsize
+          \item Ứng dụng di động dễ sập do \textbf{mất mạng}, \textbf{timeout}, hoặc API 500.
+          \item JSON parsing ném \texttt{TypeError} làm trắng xóa màn hình.
+          \item Xử lý lỗi chắp vá, try-catch rải rác khắp UI.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+
+    \begin{column}{0.32\textwidth}
+      \begin{tcolorbox}[colback=IndigoAccent!5, colframe=IndigoAccent, title=\textbf{2. Giải pháp kiến trúc}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{2pt}\scriptsize
+          \item \textbf{Clean Architecture}: Tách độc lập hoàn toàn Domain nghiệp vụ.
+          \item \textbf{Centralized Pipeline}: Quy trình 5 bước xử lý lỗi tập trung.
+          \item \textbf{Result Pattern}: Loại bỏ ném lỗi tự do ra ngoài.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+
+    \begin{column}{0.32\textwidth}
+      \begin{tcolorbox}[colback=EmeraldGreen!5, colframe=EmeraldGreen, title=\textbf{3. Giá trị mang lại}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{2pt}\scriptsize
+          \item \textbf{Tự phục hồi}: Fallback offline cache SharedPreferences.
+          \item \textbf{Trải nghiệm nhất quán}: Dịch lỗi sang tiếng Việt thân thiện.
+          \item \textbf{Độ tin cậy}: 223 automated tests PASS 100\%.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+  \end{columns}
+  \note{Ứng dụng di động rất dễ crash vì mạng yếu hoặc server lỗi. Mục tiêu của nhóm là xây dựng hệ thống có khả năng tự phục hồi, bảo toàn dữ liệu và luôn mang lại trải nghiệm mượt mà.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 3: BẢNG PHÂN CÔNG WBS
+% ------------------------------------------------------------------------------
+\begin{frame}{Bảng Phân Công Công Việc WBS (50\% -- 50\%) \speakerB}
+  \vspace{-1mm}
+  \begin{table}[h]
+    \centering
+    \renewcommand{\arraystretch}{1.1}
+    {\scriptsize
+    \begin{tabularx}{\textwidth}{l p{7.2cm} c c}
+      \toprule
+      \rowcolor{NavyPrimary!15}
+      \textbf{Nhóm vai trò bắt buộc} & \textbf{Nhiệm vụ kỹ thuật chi tiết} & \textbf{Người phụ trách} & \textbf{Tỷ lệ} \\
+      \midrule
+      \textbf{1. UI Design} & Theme Material 3, List Screen, Form, ErrorView & \textbf{Phạm Nhung} & 50\% \\
+      \textbf{2. Business Logic} & Entities, Validation Rules, 6 Use Cases, Git Setup & \textbf{Nguyễn Đức Hải} & 50\% \\
+      \textbf{3. State Management} & TransactionNotifier, Pipeline, Safety Net, MultiProvider & \textbf{Nguyễn Đức Hải} & 50\% \\
+      \textbf{4. Database / API} & Models, JSON Parsing, FakeRemote, Cache, FileLogger & \textbf{Phạm Nhung} & 50\% \\
+      \rowcolor{SlateLight}
+      \textbf{5. Báo cáo / Slide / QA} & Simulator, Log Viewer, 223 Tests, Refactor, Docs & \textbf{Cả 2 thành viên} & 50\% - 50\% \\
+      \bottomrule
+    \end{tabularx}}
+  \end{table}
+
+  \begin{infobox}{Cam kết tuân thủ đề bài}
+    \scriptsize Toàn bộ 5 vai trò kỹ thuật được phân chia đồng đều 50\% -- 50\% giữa SV A và SV B, có commit và PR đối chiếu trong lịch sử Git repository.
+  \end{infobox}
+  \note{Nhóm chia đều khối lượng công việc 50-50 theo đúng 5 vai trò kỹ thuật của đề bài. Nhung phụ trách giao diện và tầng dữ liệu; Hải phụ trách logic nghiệp vụ, quản lý trạng thái và xử lý lỗi.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 4: KIẾN TRÚC CLEAN ARCHITECTURE 4 TẦNG
+% ------------------------------------------------------------------------------
+\begin{frame}{Kiến Trúc Clean Architecture 4 Tầng \speakerB}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
+        \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=2mm, text width=6.2cm, align=center, inner sep=5pt] (UI) at (0, 3.2) {
+          \textbf{Presentation Layer}\\[1pt]
+          {\tiny Screens, Widgets, TransactionNotifier, ErrorBoundary}
+        };
+
+        \node[draw=EmeraldGreen!80!black, fill=EmeraldGreen!10, rounded corners=2mm, text width=6.2cm, align=center, inner sep=5pt] (Domain) at (0, 1.6) {
+          \textbf{Domain Layer (Cốt lõi nghiệp vụ -- Pure Dart)}\\[1pt]
+          {\tiny Entities, Value Objects, Use Cases, Repository Interfaces}
+        };
+
+        \node[draw=CyanAccent!80!black, fill=CyanAccent!10, rounded corners=2mm, text width=6.2cm, align=center, inner sep=5pt] (Data) at (0, 0) {
+          \textbf{Data Layer (Hạ tầng dữ liệu)}\\[1pt]
+          {\tiny DataSources, Models (JSON), Repository Implementations}
+        };
+
+        \node[draw=SlateMuted, fill=SlateLight, rounded corners=2mm, text width=6.2cm, align=center, inner sep=4pt] (Core) at (0, -1.3) {
+          \textbf{Core Layer (Hạ tầng dùng chung)}\\[1pt]
+          {\tiny Result\textless T\textgreater, ErrorHandler Pipeline, AppException, Loggers}
+        };
+
+        \draw[-{Latex[length=2.5mm]}, thick, NavyPrimary] (UI) -- node[right, font=\tiny] {depends} (Domain);
+        \draw[-{Latex[length=2.5mm]}, thick, CyanAccent!80!black] (Data) -- node[right, font=\tiny] {implements} (Domain);
+        \draw[-{Latex[length=2mm]}, dashed, SlateMuted] (UI.west) to[out=180,in=180] (Core.west);
+        \draw[-{Latex[length=2mm]}, dashed, SlateMuted] (Domain.west) to[out=190,in=170] (Core.west);
+        \draw[-{Latex[length=2mm]}, dashed, SlateMuted] (Data.west) to[out=180,in=190] (Core.west);
+      \end{tikzpicture}
+    \end{column}
+
+    \begin{column}{0.45\textwidth}
+      \begin{infobox}[NavyPrimary]{Nguyên tắc Dependency Rule}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Phụ thuộc hướng tâm}: Mọi phụ thuộc đều trỏ vào trung tâm \textbf{Domain}.
+          \item \textbf{Domain độc lập tuyệt đối}: Không import Flutter hay Database.
+          \item \textbf{Dễ bảo trì \& kiểm thử}: Giao diện và CSDL có thể thay thế mà không ảnh hưởng nghiệp vụ.
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+  \end{columns}
+  \note{Mũi tên phụ thuộc chỉ đi từ ngoài vào trong. Nhờ cấu trúc này, Flutter UI hay SharedPreferences chỉ là chi tiết bên ngoài, không thể làm ảnh hưởng tới quy tắc tài chính cốt lõi ở Domain.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 5: DATA FLOW SEQUENCE DIAGRAM
+% ------------------------------------------------------------------------------
+\begin{frame}{Luồng Dữ Liệu Hệ Thống (Data Flow) \speakerB}
+  \centering
+  \begin{tikzpicture}[scale=0.74, every node/.style={transform shape}]
+    \node[draw=NavyDark, fill=NavyDark, text=white, rounded corners=1mm, minimum width=1.8cm, minimum height=0.55cm] (Actor) at (0, 4) {\scriptsize Người dùng};
+    \node[draw=NavyPrimary, fill=NavyPrimary, text=white, rounded corners=1mm, minimum width=2.2cm, minimum height=0.55cm] (UI) at (3.2, 4) {\scriptsize Form / Notifier};
+    \node[draw=EmeraldGreen!80!black, fill=EmeraldGreen!80!black, text=white, rounded corners=1mm, minimum width=2.4cm, minimum height=0.55cm] (UC) at (7, 4) {\scriptsize AddTransaction (UC)};
+    \node[draw=CyanAccent!80!black, fill=CyanAccent!80!black, text=white, rounded corners=1mm, minimum width=2.4cm, minimum height=0.55cm] (RP) at (10.8, 4) {\scriptsize Repository};
+    \node[draw=SlateMuted, fill=SlateMuted, text=white, rounded corners=1mm, minimum width=2cm, minimum height=0.55cm] (DB) at (14.2, 4) {\scriptsize Remote / Cache};
+
+    \draw[dashed, gray] (Actor) -- (0, -0.6);
+    \draw[dashed, gray] (UI) -- (3.2, -0.6);
+    \draw[dashed, gray] (UC) -- (7, -0.6);
+    \draw[dashed, gray] (RP) -- (10.8, -0.6);
+    \draw[dashed, gray] (DB) -- (14.2, -0.6);
+
+    \draw[-{Latex}, thick] (0, 3.3) -- node[above, font=\tiny] {1. Bấm Lưu} (3.2, 3.3);
+    \draw[-{Latex}, thick, NavyPrimary] (3.2, 2.7) -- node[above, font=\tiny] {2. call(TransactionDraft)} (7, 2.7);
+    \draw[-{Latex}, thick, EmeraldGreen!80!black] (7, 2.3) arc[start angle=90, end angle=-90, radius=0.25] node[right, font=\tiny] {3. draft.ensureValid()};
+    \draw[-{Latex}, thick, CyanAccent!80!black] (7, 1.4) -- node[above, font=\tiny] {4. add(transaction)} (10.8, 1.4);
+    \draw[-{Latex}, thick, SlateMuted] (10.8, 0.8) -- node[above, font=\tiny] {5. Lưu vào API \& Cache} (14.2, 0.8);
+    \draw[-{Latex}, dashed, thick, SlateMuted] (14.2, 0.3) -- node[above, font=\tiny] {6. Trả kết quả Model} (10.8, 0.3);
+    \draw[-{Latex}, dashed, thick, EmeraldGreen!80!black] (10.8, -0.1) -- node[above, font=\tiny] {7. Result.success(tx)} (3.2, -0.1);
+    \draw[-{Latex}, dashed, thick] (3.2, -0.4) -- node[above, font=\tiny] {8. Cập nhật UI \& đóng form} (0, -0.4);
+  \end{tikzpicture}
+  \vspace{-1mm}
+  \begin{infobox}[EmeraldGreen]{Chặn lỗi sớm tại Use Case}
+    \scriptsize Dữ liệu bắt buộc phải qua Use Case kiểm tra tính hợp lệ trước khi chạm tới Repository. Nếu người dùng nhập số tiền âm, lỗi bị chặn ngay tại Use Case mà không tốn tài nguyên gọi mạng.
+  \end{infobox}
+  \note{Sơ đồ minh họa luồng khi thêm giao dịch. Dữ liệu bắt buộc phải qua Use Case kiểm tra tính hợp lệ trước. Nếu số tiền âm, lỗi bị chặn ngay mà không tốn tài nguyên gọi xuống cơ sở dữ liệu.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 6: NAMED CONSTRUCTOR (R1)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Named Constructor: Ngữ Nghĩa \& Immutability (R1) \speakerA}
+  \begin{columns}[c]
+    \begin{column}{0.48\textwidth}
+      \begin{infobox}[IndigoAccent]{Đặc điểm kỹ thuật}
+        \begin{itemize}\setlength{\itemsep}{4pt}\scriptsize
+          \item \textbf{Tăng tính biểu đạt}: Tên hàm nói lên mục đích khởi tạo nghiệp vụ.
+          \item \textbf{Loại bỏ magic numbers}: Dùng \texttt{Money.zero()} thay cho \texttt{Money(0)}.
+          \item \textbf{Tối ưu bộ nhớ}: Khởi tạo hằng số biên dịch với từ khóa \texttt{const}.
+        \end{itemize}
+      \end{infobox}
+      \vspace{2mm}
+      \begin{infobox}[NavyPrimary]{Ứng dụng thực tế}
+        \scriptsize Sử dụng trong \texttt{Money.zero}, \texttt{TransactionSummary.empty}, \texttt{ErrorView.compact}.
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.52\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/domain/entities/money.dart}}\\[1mm]
+\begin{lstlisting}
+class Money {
+  final int amount;
+
+  const Money(this.amount);
+
+  // R1: Named constructor for zero value
+  const Money.zero() : amount = 0;
+
+  bool get isZero => amount == 0;
+  bool get isNegative => amount < 0;
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{Named Constructor giúp code tự giải thích chính nó. Thay vì để lập trình viên truyền số 0 tùy tiện, Money.zero đảm bảo khởi tạo một đối tượng bất biến với giá trị mặc định chuẩn mực.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 7: FACTORY CONSTRUCTOR (R2)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Factory Constructor: Chốt Chặn Dữ Liệu JSON (R2) \speakerA}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \begin{infobox}[RoseDanger]{Phòng thủ kiểu dữ liệu}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Defensive Parsing}: Kiểm tra cấu trúc trước khi khởi tạo thực thể.
+          \item \textbf{Chặn lỗi runtime}: Triệt tiêu \texttt{TypeError}, \texttt{NullCheckError} khi API đổi schema.
+          \item \textbf{Chuẩn hóa ngoại lệ}: Ném \texttt{ParseException} có đầy đủ thông tin vị trí lỗi.
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.54\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/data/models/transaction_model.dart}}\\[1mm]
+\begin{lstlisting}
+factory TransactionModel.fromJson(Object? json) {
+  if (json == null || json is! Map) {
+    throw ParseException(
+      message: 'Invalid JSON: Expected Map',
+      originalError: json,
+      stackTrace: StackTrace.current,
+    );
+  }
+  final map = Map<String, dynamic>.from(json);
+  // Parsing an toan tung truong du lieu...
+  return TransactionModel(
+    id: map['id'] as String,
+    title: map['title'] as String,
+    // ...
+  );
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{Factory Constructor trong TransactionModel đóng vai trò người gác cổng dữ liệu. Khi server trả về JSON sai định dạng hoặc null, factory sẽ chặn lại và ném ParseException kèm StackTrace.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 8: DART MIXINS (R3)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Dart Mixins: Tái Sử Dụng Logic (R3) \speakerA}
+  \begin{columns}[c]
+    \begin{column}{0.48\textwidth}
+      \begin{infobox}[IndigoAccent]{Composition over Inheritance}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Không phá vỡ cây kế thừa}: Nhúng hành vi vào thực thể linh hoạt.
+          \item \textbf{Bộ 3 Mixin chuyên biệt}:
+          \begin{itemize}\scriptsize
+            \item \texttt{ValidatableMixin}: Getter \texttt{isValid}, \texttt{ensureValid()}.
+            \item \texttt{LoggableMixin}: Tự trích xuất tag log theo runtimeType.
+            \item \texttt{TimestampMixin}: Quản lý ngày tạo và ngày cập nhật.
+          \end{itemize}
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.52\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/core/utils/validatable_mixin.dart}}\\[1mm]
+\begin{lstlisting}
+mixin ValidatableMixin {
+  List<ValidationException> validate();
+
+  bool get isValid => validate().isEmpty;
+  ValidationException? get firstError => 
+      validate().firstOrNull;
+
+  Result<void> ensureValid() {
+    final error = firstError;
+    if (error == null) return const Success(null);
+    return Failure(error);
+  }
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{Dart chỉ hỗ trợ đơn kế thừa, nên nhóm dùng Mixin để tái sử dụng logic. Chỉ cần gắn with ValidatableMixin, bất kỳ Entity hay Draft nào cũng lập tức có khả năng tự kiểm tra hợp lệ.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 9: GENERIC RESULT PATTERN (R4)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Type-Safety: Generic Result Pattern (R4) \speakerA}
+  \begin{columns}[c]
+    \begin{column}{0.45\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
+        \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=2mm, text width=4.5cm, align=center, inner sep=4pt] (Root) at (0, 2) {
+          \textbf{Result\textless T\textgreater{} (sealed class)}\\[1pt]
+          {\tiny fold(onSuccess, onFailure)}
+        };
+        \node[draw=EmeraldGreen, fill=EmeraldGreen!15, rounded corners=2mm, text width=2.2cm, align=center, inner sep=3pt] (Succ) at (-1.5, 0) {
+          \textbf{Success\textless T\textgreater}\\[1pt]
+          {\tiny final T data}
+        };
+        \node[draw=RoseDanger, fill=RoseDanger!15, rounded corners=2mm, text width=2.2cm, align=center, inner sep=3pt] (Fail) at (1.5, 0) {
+          \textbf{Failure\textless T\textgreater}\\[1pt]
+          {\tiny AppException error}
+        };
+        \draw[-{Latex}, thick] (Root) -- (Succ);
+        \draw[-{Latex}, thick] (Root) -- (Fail);
+      \end{tikzpicture}
+      \vspace{2mm}
+      \begin{infobox}[EmeraldGreen]{Lập trình hàm (Functional)}
+        \scriptsize Phương thức \texttt{fold()} ép buộc UI phải xử lý cả 2 nhánh thành công \& thất bại.
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.55\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/core/utils/result.dart}}\\[1mm]
+\begin{lstlisting}
+sealed class Result<T> {
+  const Result();
+  bool get isSuccess;
+  bool get isFailure => !isSuccess;
+
+  R fold<R>(
+    R Function(T data) onSuccess,
+    R Function(AppException error) onFailure,
+  );
+}
+
+final class Success<T> extends Result<T> {
+  final T data;
+  const Success(this.data);
+  // ...
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{Thay vì để các hàm throw lỗi tự do khiến tầng UI phải đoán chỗ đặt try-catch, sealed class Result ép buộc lập trình viên phải xử lý cả 2 nhánh qua hàm fold, triệt tiêu nguy cơ bỏ quên lỗi.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 10: TÁCH RIÊNG DOMAIN THUẦN KHIẾT (R5)
+% ------------------------------------------------------------------------------
+\begin{frame}{Tách Riêng Domain Thuần Khiết (Pure Dart) (R5) \speakerB}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{tcolorbox}[colback=EmeraldGreen!5, colframe=EmeraldGreen, title=\textbf{Được phép trong Domain}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Pure Dart}: 100\% mã nguồn Dart tiêu chuẩn.
+          \item \textbf{Entities \& Value Objects}: \texttt{Transaction}, \texttt{Money}.
+          \item \textbf{Pure Use Cases}: \texttt{AddTransaction}, \texttt{GetAllTransactions}.
+          \item \textbf{Repository Interfaces}: Khai báo hợp đồng trừu tượng.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{tcolorbox}[colback=RoseDanger!5, colframe=RoseDanger, title=\textbf{Tuyệt đối cấm trong Domain}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{CẤM import Flutter}: Không có \texttt{material.dart}.
+          \item \textbf{CẤM thư viện ngoài}: Không \texttt{provider}, \texttt{shared\_preferences}.
+          \item \textbf{CẤM chi tiết lưu trữ}: Không biết đến HTTP, SQL hay JSON.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+  \end{columns}
+  \vspace{1mm}
+  \begin{infobox}[IndigoAccent]{Lợi ích kiến trúc}
+    \scriptsize \textbf{Kiểm thử siêu tốc}: Toàn bộ 48 tests của Domain chạy hoàn tất trong vòng \textbf{0.2 giây} mà không cần khởi tạo widget tester hay platform channels.
+  \end{infobox}
+  \note{Domain thuần khiết là tiêu chuẩn khắt khe nhất của Clean Architecture. Trong thư mục domain không có bất kỳ import Flutter nào, giúp logic tính toán tài chính có thể tái sử dụng bất cứ đâu.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 11: PURE CONSTRUCTOR DI (R5)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Pure Constructor Dependency Injection (R5) \speakerB}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \begin{infobox}[IndigoAccent]{Không dùng Service Locator ẩn}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Rõ ràng phụ thuộc}: Mọi dependency được truyền tường minh qua constructor.
+          \item \textbf{Tiêm clock}: Kiểm thử mốc ngày biên mà không phụ thuộc đồng hồ hệ điều hành.
+          \item \textbf{Tiêm idGenerator}: Kiểm soát mã giao dịch sinh ra phục vụ Unit Test.
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.54\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/domain/usecases/add_transaction.dart}}\\[1mm]
+\begin{lstlisting}
+class AddTransaction {
+  final TransactionRepository _repository;
+  final String Function() _idGenerator;
+  final DateTime Function() _clock;
+
+  AddTransaction(
+    this._repository, {
+    String Function()? idGenerator,
+    DateTime Function()? clock,
+  })  : _idGenerator = idGenerator ?? _defaultIdGen,
+        _clock = clock ?? _defaultClock;
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{Để kiểm thử độc lập, Use Case nhận clock và idGenerator từ Constructor. Trong Unit Test, nhóm có thể đóng băng thời gian tại ngày cụ thể để kiểm tra logic mà không sợ test bị fail khi chạy ngày khác.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 12: REPOSITORY PATTERN & DIP (R6)
+% ------------------------------------------------------------------------------
+\begin{frame}{Repository Pattern \& Dependency Inversion (R6) \speakerB}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
+        \node[draw=EmeraldGreen!80!black, fill=EmeraldGreen!10, rounded corners=1.5mm, text width=6.6cm, align=left, inner sep=4pt] (Interface) at (0, 2.2) {
+          \textbf{\scriptsize <<interface>> TransactionRepository} \hfill \textit{\tiny (Domain)}\\[2pt]
+          {\tiny + getAll() : Future\textless Result\textless List\textless Transaction\textgreater\textgreater\textgreater}\\[1pt]
+          {\tiny + add(tx) : Future\textless Result\textless Transaction\textgreater\textgreater}
+        };
+
+        \node[draw=CyanAccent!80!black, fill=CyanAccent!10, rounded corners=1.5mm, text width=6.6cm, align=left, inner sep=4pt] (Impl) at (0, -0.2) {
+          \textbf{\scriptsize TransactionRepositoryImpl} \hfill \textit{\tiny (Data)}\\[2pt]
+          {\tiny - RemoteDataSource \_remote}\\[1pt]
+          {\tiny - LocalDataSource \_local}\\[1pt]
+          {\tiny + getAll() / + add(tx)}
+        };
+
+        \draw[-{Latex[open, length=3mm]}, thick, dashed] (Impl) -- node[right, font=\tiny] {implements} (Interface);
+      \end{tikzpicture}
+    \end{column}
+
+    \begin{column}{0.45\textwidth}
+      \begin{infobox}[CyanAccent!80!black]{Nguyên lý đảo ngược (DIP)}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Domain sở hữu Interface}: Tầng nghiệp vụ quy định hợp đồng làm việc.
+          \item \textbf{Data hiện thực hóa}: Độc lập chi tiết kết nối mạng và bộ nhớ đệm.
+          \item \textbf{Dễ hoán đổi}: Chuyển từ Fake API sang Real REST API chỉ bằng việc đổi 1 dòng ở Composition Root.
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+  \end{columns}
+  \note{Đây là nguyên lý đảo ngược phụ thuộc DIP. Tầng Domain đưa ra đề bài thông qua Interface. Tầng Data nhận đề bài và giải quyết bằng Impl. Hai tầng nói chuyện với nhau qua hợp đồng.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 13: CHIẾN LƯỢC FALLBACK CACHE (R8)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Chiến Lược Fallback Cache Khi Mất Mạng (R8) \speakerB}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \begin{infobox}[EmeraldGreen]{Khả năng phục hồi (Resilience)}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Phân loại thông minh}: Chỉ lỗi mất mạng/timeout/500 mới kích hoạt đọc cache.
+          \item \textbf{Chặn rò rỉ lỗi sai}: Lỗi 404 hoặc Validation dứt khoát không fallback.
+          \item \textbf{Trải nghiệm liên tục}: Người dùng vẫn thấy dữ liệu cũ kèm thông báo cảnh báo.
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.54\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/data/repositories/transaction_repository_impl.dart}}\\[1mm]
+\begin{lstlisting}
+bool _shouldFallbackToCache(AppException error) {
+  return switch (error) {
+    NetworkException() => true,
+    RequestTimeoutException() => true,
+    ServerException(:final statusCode) => 
+        statusCode >= 500,
+    ParseException() => true,
+    _ => false,
+  };
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{Hàm shouldFallbackToCache thể hiện tính chịu lỗi của app. Khi gặp mất mạng hay server 500, hệ thống tự động đọc dữ liệu offline từ cache để hiển thị, bảo đảm tính liên tục của trải nghiệm.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 14: CÂY NGOẠI LỆ SEALED CLASS (R9)
+% ------------------------------------------------------------------------------
+\begin{frame}{Cây Ngoại Lệ Sealed Class AppException (R9) \speakerA}
+  \centering
+  \begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
+    \node[draw=NavyDark, fill=NavyDark, text=white, rounded corners=2mm, text width=6cm, align=center, inner sep=4pt] (Root) at (0, 3.2) {
+      \textbf{AppException (sealed class)}\\[1pt]
+      {\tiny message, code, severity, originalError, stackTrace}
+    };
+
+    \node[draw=RoseDanger, fill=RoseDanger!10, rounded corners=1mm, text width=3cm, align=center] (N1) at (-5.2, 1.4) {\textbf{\tiny NetworkException}\\{\tiny Lỗi kết nối socket}};
+    \node[draw=RoseDanger, fill=RoseDanger!10, rounded corners=1mm, text width=3cm, align=center] (N2) at (-1.75, 1.4) {\textbf{\tiny RequestTimeoutException}\\{\tiny Quá hạn yêu cầu}};
+    \node[draw=RoseDanger, fill=RoseDanger!10, rounded corners=1mm, text width=3cm, align=center] (N3) at (1.75, 1.4) {\textbf{\tiny ServerException}\\{\tiny Máy chủ mã lỗi 5xx}};
+    \node[draw=RoseDanger, fill=RoseDanger!10, rounded corners=1mm, text width=3cm, align=center] (N4) at (5.2, 1.4) {\textbf{\tiny ParseException}\\{\tiny JSON sai định dạng}};
+
+    \node[draw=AmberWarn, fill=AmberWarn!10, rounded corners=1mm, text width=3cm, align=center] (N5) at (-5.2, -0.2) {\textbf{\tiny CacheException}\\{\tiny Bộ nhớ đệm hỏng}};
+    \node[draw=AmberWarn, fill=AmberWarn!10, rounded corners=1mm, text width=3cm, align=center] (N6) at (-1.75, -0.2) {\textbf{\tiny ValidationException}\\{\tiny Vi phạm nghiệp vụ}};
+    \node[draw=SlateMuted, fill=SlateLight, rounded corners=1mm, text width=3cm, align=center] (N7) at (1.75, -0.2) {\textbf{\tiny NotFoundException}\\{\tiny Không tìm thấy ID}};
+    \node[draw=SlateMuted, fill=SlateLight, rounded corners=1mm, text width=3cm, align=center] (N8) at (5.2, -0.2) {\textbf{\tiny UnknownException}\\{\tiny Ngoại lệ ngoài dự kiến}};
+
+    \draw[-{Latex}, thick] (Root) -| (N1);
+    \draw[-{Latex}, thick] (Root) -| (N2);
+    \draw[-{Latex}, thick] (Root) -| (N3);
+    \draw[-{Latex}, thick] (Root) -| (N4);
+    \draw[-{Latex}, thick] (Root) -| (N5);
+    \draw[-{Latex}, thick] (Root) -| (N6);
+    \draw[-{Latex}, thick] (Root) -| (N7);
+    \draw[-{Latex}, thick] (Root) -| (N8);
+  \end{tikzpicture}
+  \vspace{-1mm}
+  \begin{infobox}[IndigoAccent]{Exhaustive Pattern Matching}
+    \scriptsize Trình biên dịch Dart 3 bắt buộc câu lệnh \texttt{switch (error)} phải xử lý đủ 8 trường hợp, loại bỏ hoàn toàn nguy cơ sót lỗi tiềm ẩn.
+  \end{infobox}
+  \note{Nhóm chuẩn hóa toàn bộ sự cố thành sealed class AppException với 8 lớp con. Nhờ tính đóng của Dart 3, nếu quên xử lý một loại ngoại lệ, trình biên dịch sẽ báo lỗi ngay lập tức.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 15: FACTORY PATTERN EXCEPTION FACTORY (R7)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Factory Pattern: ExceptionFactory.from (R7) \speakerA}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \begin{infobox}[IndigoAccent]{Chuyển đổi lỗi tập trung}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Xử lý lỗi thô}: Đóng gói \texttt{SocketException}, \texttt{TimeoutException} thành \texttt{AppException}.
+          \item \textbf{Type-Safe}: Tham số \texttt{Object error}, nói KHÔNG với \texttt{dynamic}.
+          \item \textbf{Idempotent}: Nếu đối tượng đã là \texttt{AppException} thì trả về ngay, không bọc lặp lại.
+        \end{itemize}
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.54\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/core/errors/exception_factory.dart}}\\[1mm]
+\begin{lstlisting}
+static AppException from(Object error, [StackTrace? st]) {
+  if (error is AppException) return error;
+
+  final trace = st ?? StackTrace.current;
+
+  if (error is SocketException) {
+    return NetworkException(
+      message: 'Network socket failure: ' + error.message,
+      originalError: error,
+      stackTrace: trace,
+    );
+  }
+  // Tuong tu cho TimeoutException, FormatException...
+  return UnknownException(
+    message: error.toString(),
+    stackTrace: trace,
+  );
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{ExceptionFactory đóng vai trò là bộ chuyển đổi tập trung. Các lỗi socket tầng thấp của hệ điều hành được đóng gói thành NetworkException. Hàm nhận Object error đảm bảo an toàn tĩnh 100%.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 16: CENTRALIZED ERROR PIPELINE 5 BƯỚC (R11)
+% ------------------------------------------------------------------------------
+\begin{frame}{Centralized Error Pipeline 5 Bước Tuần Tự (R11) \speakerA}
+  \centering
+  \begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
+    \node[draw=RoseDanger, fill=RoseDanger!15, rounded corners=1.5mm, text width=1.6cm, align=center, inner sep=3pt] (E) at (0, 0) {\scriptsize\textbf{Lỗi Thô}\\(raw error)};
+    
+    \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=1.5mm, text width=2.1cm, align=center, inner sep=3pt] (S1) at (2.6, 0) {\scriptsize\textbf{1. Chuẩn hóa}\\(ExceptionFactory)};
+    
+    \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=1.5mm, text width=2.1cm, align=center, inner sep=3pt] (S2) at (5.4, 0) {\scriptsize\textbf{2. Phân loại}\\(Severity)};
+    
+    \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=1.5mm, text width=2.1cm, align=center, inner sep=3pt] (S3) at (8.2, 0) {\scriptsize\textbf{3. Ghi log}\\(File/Console)};
+    
+    \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=1.5mm, text width=2.1cm, align=center, inner sep=3pt] (S4) at (11.0, 0) {\scriptsize\textbf{4. Đánh giá}\\(canRetry)};
+    
+    \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=1.5mm, text width=2.1cm, align=center, inner sep=3pt] (S5) at (13.8, 0) {\scriptsize\textbf{5. Bản địa hóa}\\(Tiếng Việt)};
+
+    \node[draw=EmeraldGreen, fill=EmeraldGreen!15, rounded corners=1.5mm, text width=2.2cm, align=center, inner sep=3pt] (Out) at (6.9, -1.5) {\scriptsize\textbf{UserFacingError}\\\tiny(An toàn hiển thị UI)};
+
+    \draw[-{Latex}, thick] (E) -- (S1);
+    \draw[-{Latex}, thick] (S1) -- (S2);
+    \draw[-{Latex}, thick] (S2) -- (S3);
+    \draw[-{Latex}, thick] (S3) -- (S4);
+    \draw[-{Latex}, thick] (S4) -- (S5);
+    \draw[-{Latex}, thick, EmeraldGreen] (S5) |- (Out);
+  \end{tikzpicture}
+  \vspace{-1mm}
+  \begin{infobox}[EmeraldGreen]{Hợp đồng an toàn tuyệt đối}
+    \scriptsize Phương thức \texttt{ErrorHandler.handle()} cam kết \textbf{KHÔNG BAO GIỜ throw lỗi ra ngoài}, luôn trả về \texttt{UserFacingError} an toàn cho giao diện.
+  \end{infobox}
+  \note{Trái tim của hệ thống là Pipeline 5 bước trong ErrorHandler. Mọi lỗi đều qua phễu này để được ghi log ra file app_errors.log và dịch thành câu tiếng Việt dễ hiểu kèm cờ canRetry cho UI.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 17: 3-TIER GLOBAL SAFETY NET (R10)
+% ------------------------------------------------------------------------------
+\begin{frame}{3-Tier Global Safety Net (Lưới An Toàn Toàn Cục) (R10) \speakerA}
+  \centering
+  \begin{tikzpicture}[scale=0.88, every node/.style={transform shape}]
+    \node[draw=NavyDark, fill=NavyDark!10, rounded corners=3mm, line width=1pt, minimum width=13.6cm, minimum height=4.2cm, label={[NavyDark, font=\scriptsize\bfseries]north:Tầng 3: runZonedGuarded -- Vùng an toàn bao bọc luồng thực thi main()}] (T3) at (0, 0) {};
+
+    \node[draw=NavyPrimary, fill=NavyPrimary!10, rounded corners=2.5mm, line width=0.8pt, minimum width=11.8cm, minimum height=2.8cm, label={[NavyPrimary, font=\scriptsize\bfseries]north:Tầng 2: PlatformDispatcher.onError -- Hứng lỗi bất đồng bộ (Engine / Isolate / Async)}] (T2) at (0, -0.3) {};
+
+    \node[draw=RoseDanger, fill=RoseDanger!10, rounded corners=2mm, line width=0.8pt, minimum width=10.2cm, minimum height=1.4cm, label={[RoseDanger, font=\scriptsize\bfseries]north:Tầng 1: FlutterError.onError -- Hứng lỗi Widget Lifecycle, Render, Build}] (T1) at (0, -0.6) {};
+
+    \node[text=NavyDark, font=\scriptsize\bfseries] at (0, -0.9) {Toàn bộ giao diện Widgets \& Nghiệp vụ ứng dụng};
+  \end{tikzpicture}
+  \vspace{-1mm}
+  \begin{infobox}[NavyDark]{Tự động leo thang sự cố (Auto Escalation)}
+    \scriptsize Bất kỳ lỗi lọt lưới nào rơi vào Tầng 2 hoặc Tầng 3 đều được tự động gắn mức \textbf{CRITICAL} và ghi vào nhật ký khẩn cấp.
+  \end{infobox}
+  \note{Để app không bao giờ crash đột ngột, nhóm thiết lập lưới an toàn 3 tầng tại main(). Kể cả lỗi async chạy ngầm không ai bắt, PlatformDispatcher sẽ tóm lấy, nâng lên mức CRITICAL và ghi log.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 18: ERROR BOUNDARY & FINALLY (R8, R10)
+% ------------------------------------------------------------------------------
+\begin{frame}[fragile]{Error Boundary \& Phòng Thủ UI Với finally (R8, R10) \speakerA}
+  \begin{columns}[c]
+    \begin{column}{0.48\textwidth}
+      \begin{infobox}[RoseDanger]{ErrorBoundary cô lập sự cố}
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Không crash toàn app}: Chỉ khu vực widget lỗi hiện thông báo, AppBar \& Menu vẫn bấm bình thường.
+          \item \textbf{Khối finally thực tế}: Luôn reset \texttt{\_isSubmitting = false}, chống treo nút bấm khi có ngoại lệ bất ngờ.
+        \end{itemize}
+      \end{infobox}
+      \vspace{1mm}
+      \begin{infobox}[IndigoAccent]{ErrorWidget.builder}
+        \scriptsize Thay thế màn hình đỏ xám cục bộ bằng \texttt{ErrorView.compact}.
+      \end{infobox}
+    \end{column}
+
+    \begin{column}{0.52\textwidth}
+\vspace{1mm}
+{\scriptsize\bfseries\color{NavyPrimary} $\blacktriangleright$ Trích: \texttt{lib/presentation/state/transaction_notifier.dart}}\\[1mm]
+\begin{lstlisting}
+} catch (error, stackTrace) {
+  // Centralized error pipeline
+  final userFacing = await _errorHandler.handle(
+    error, stackTrace
+  );
+  reportBoundaryError(userFacing);
+  return null;
+} finally {
+  // R8: Always release loading flag
+  if (setSubmitting) _isSubmitting = false;
+  _safeNotifyListeners();
+}
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \note{ErrorBoundary cách ly sự cố: khi widget con lỗi, chỉ khu vực đó hiện thông báo, AppBar vẫn hoạt động. Khối finally tại Notifier luôn giải phóng cờ isSubmitting, chống treo nút bấm.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 19: CHUYỂN TIẾP SANG DEMO
+% ------------------------------------------------------------------------------
+\begin{frame}{Chuyển Tiếp Sang Demo: Simulator \& Log Viewer \speakerBoth}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{tcolorbox}[colback=NavyDark!5, colframe=NavyDark, title=\textbf{1. Bảng Giả Lập Lỗi (Error Simulator)}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Chế độ mạng}: Socket, Timeout, 500, Parse JSON.
+          \item \textbf{Nút kích hoạt lỗi}:
+          \begin{itemize}\scriptsize
+            \item Thử thách lỗi Render Build (Tầng 1).
+            \item Thử thách lỗi Unhandled Async (Tầng 2/3).
+            \item Nhập số tiền âm (Validation Error).
+          \end{itemize}
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{tcolorbox}[colback=IndigoAccent!5, colframe=IndigoAccent, title=\textbf{2. Nhật Ký Lỗi (Log Viewer)}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Đọc file trực tiếp}: File \texttt{app\_errors.log} theo thời gian thực.
+          \item \textbf{Bộ lọc thông minh}: Tất cả / Warning / Critical.
+          \item \textbf{Sao chép StackTrace}: Phục vụ chẩn đoán kỹ thuật.
+          \item \textbf{Dọn dẹp nhật ký}: Xóa log trở về trạng thái sạch.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+  \end{columns}
+  \vspace{1mm}
+  \begin{infobox}[EmeraldGreen]{Quy trình demo 5 phút}
+    \scriptsize 1' Luồng bình thường $\rightarrow$ 2' Kích hoạt 4 kịch bản lỗi Simulator $\rightarrow$ 1' Kiểm tra Log Viewer $\rightarrow$ 1' Đối chiếu code then chốt.
+  \end{infobox}
+  \note{Để chứng minh kiến trúc hoạt động thật 100%, nhóm tích hợp trực tiếp bảng điều khiển Error Simulator và Log Viewer. Sau đây nhóm xin phép chuyển sang phần demo thực nghiệm trên ứng dụng.}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 20: TỔNG KẾT & Q&A
+% ------------------------------------------------------------------------------
+\begin{frame}{Tổng Kết Dự Án \& Sẵn Sàng Trả Lời Phản Biện \speakerBoth}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{tcolorbox}[colback=EmeraldGreen!5, colframe=EmeraldGreen, title=\textbf{Chất lượng kiểm thử tự động 100\%}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{223 / 223 tests PASS (100\%)}
+          \item \texttt{lib/domain/}: \textbf{88.64\%}
+          \item \texttt{lib/core/errors/}: \textbf{98.48\%}
+          \item \texttt{lib/core/error\_handling/}: \textbf{97.31\%}
+          \item \texttt{lib/data/repositories/}: \textbf{87.88\%}
+          \item \texttt{lib/presentation/state/}: \textbf{93.08\%}
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{tcolorbox}[colback=NavyDark!5, colframe=NavyDark, title=\textbf{Đáp ứng chuẩn mực kỹ thuật}, arc=1.5mm, fonttitle=\scriptsize\bfseries]
+        \begin{itemize}\setlength{\itemsep}{3pt}\scriptsize
+          \item \textbf{Checklist R1 -- R11}: Hoàn thành 11 / 11 tiêu chí.
+          \item \textbf{Clean Code}: 0 warning linter, 100\% hàm \texttt{build()} $\le 50$ dòng, không file UI $> 300$ dòng.
+          \item \textbf{Đóng băng mã nguồn}: Báo cáo \texttt{FREEZE\_REPORT.md} PASS 100\%.
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+  \end{columns}
+  \vspace{3mm}
+  \centering
+  {\Large\bfseries\color{NavyPrimary} XIN CHÂN THÀNH CẢM ƠN THẦY CÔ VÀ CÁC BẠN!}\\[1.5mm]
+  {\small\color{IndigoAccent}\bfseries Nhóm sẵn sàng lắng nghe và trả lời các câu hỏi phản biện (Q\&A)}
+  \note{Dự án đã hoàn thành trọn vẹn với 223 automated tests đạt độ bao phủ trên 88%, tuân thủ tuyệt đối Clean Architecture và Clean Code. Nhóm xin chân thành cảm ơn Thầy Cô và rất mong nhận câu hỏi phản biện!}
+\end{frame}
+
+\end{document}
